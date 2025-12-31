@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De Sociale Mixer – Verdeel willekeurig in groepen</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23f0fdf4' stroke='%2310b981' stroke-width='2'/%3E%3Ccircle cx='10' cy='11' r='3' fill='%2310b981'/%3E%3Ccircle cx='22' cy='11' r='3' fill='%2310b981'/%3E%3Ccircle cx='10' cy='21' r='3' fill='%2310b981' opacity='0.6'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%2310b981' opacity='0.6'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%2310b981' stroke-width='1.5' stroke-dasharray='2 2'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --wit: #ffffff;
+            --accent: #10b981;
+            --accent-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --danger-border: #fca5a5;
+            --blue-500: #3b82f6;
+            --purple-500: #8b5cf6;
+            --orange-500: #f97316;
+            --pink-500: #ec4899;
+            --teal-500: #14b8a6;
+            --indigo-500: #6366f1;
+            --amber-500: #f59e0b;
+            --cyan-500: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--slate-50);
+            color: var(--slate-700);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: var(--wit);
+            border-bottom: 1px solid var(--slate-200);
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back-link {
+            position: absolute;
+            left: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--slate-400);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .header-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--slate-800);
+            letter-spacing: -0.02em;
+        }
+
+        .header-text p {
+            font-size: 0.8125rem;
+            color: var(--slate-500);
+        }
+
+        /* Main */
+        .main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 3rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--wit);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1.5px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--slate-400);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Input section */
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 10px;
+            background: var(--wit);
+            color: var(--slate-800);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-width: 0;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .input-field::placeholder {
+            color: var(--slate-400);
+            font-size: 0.8125rem;
+        }
+
+        /* Names list */
+        .names-list {
+            flex: 1;
+            min-height: 180px;
+            max-height: 240px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            background: var(--slate-50);
+            border-radius: 10px;
+            padding: 0.5rem;
+        }
+
+        .names-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .names-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .names-list::-webkit-scrollbar-thumb {
+            background: var(--slate-300);
+            border-radius: 3px;
+        }
+
+        .name-item {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+
+        .name-item:hover {
+            background: var(--wit);
+        }
+
+        .name-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .name-text {
+            flex: 1;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--slate-700);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .name-remove {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--slate-400);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.15s;
+        }
+
+        .name-item:hover .name-remove {
+            opacity: 1;
+        }
+
+        .name-remove:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .names-count {
+            font-size: 0.75rem;
+            color: var(--slate-400);
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+
+        /* Group count control */
+        .group-control {
+            background: var(--slate-50);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .group-control-label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--slate-600);
+            margin-bottom: 0.75rem;
+        }
+
+        .number-control {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1.5px solid var(--slate-200);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--wit);
+        }
+
+        .number-control button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--slate-100);
+            color: var(--slate-600);
+            font-size: 1.25rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-control button:hover:not(:disabled) {
+            background: var(--slate-200);
+            color: var(--slate-800);
+        }
+
+        .number-control button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .number-control input {
+            flex: 1;
+            height: 44px;
+            border: none;
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--slate-800);
+            background: var(--wit);
+        }
+
+        .number-control input:focus {
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--wit);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0d9668;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--slate-100);
+            color: var(--slate-600);
+            border: 1.5px solid var(--slate-200);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--slate-300);
+            background: var(--slate-200);
+        }
+
+        .btn-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1.5px solid var(--danger-border);
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn-icon {
+            padding: 0.75rem;
+            border-radius: 10px;
+        }
+
+        .btn-shuffle {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.9375rem;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .action-row .btn {
+            flex: 1;
+            font-size: 0.8125rem;
+            padding: 0.625rem 0.75rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            color: var(--slate-400);
+            text-align: center;
+            flex: 1;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+            max-width: 200px;
+            line-height: 1.5;
+        }
+
+        /* Division warning */
+        .division-warning {
+            background: var(--danger-light);
+            border: 1.5px solid var(--danger-border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            display: none;
+        }
+
+        .division-warning.show {
+            display: block;
+        }
+
+        .division-warning-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .division-warning-header svg {
+            width: 18px;
+            height: 18px;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+
+        .division-warning-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--danger);
+        }
+
+        .division-warning-text {
+            font-size: 0.8125rem;
+            color: var(--slate-600);
+            margin-bottom: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .division-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .division-option {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: 1.5px solid var(--slate-300);
+            border-radius: 8px;
+            background: var(--wit);
+            color: var(--slate-600);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .division-option:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .division-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* Results area */
+        .results-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            background: var(--accent-light);
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+        }
+
+        .summary-text {
+            font-size: 0.875rem;
+            color: var(--slate-700);
+        }
+
+        .summary-text strong {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .btn-copy {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            background: var(--wit);
+            color: var(--slate-600);
+            border: 1.5px solid var(--slate-200);
+        }
+
+        .btn-copy svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-copy:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Groups grid */
+        .groups-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            align-content: start;
+        }
+
+        .group-card {
+            background: var(--wit);
+            border-radius: 12px;
+            border: 1.5px solid var(--slate-200);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .group-card:hover {
+            border-color: var(--slate-300);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .group-header {
+            padding: 0.75rem 1rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--wit);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .group-header .count {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 0.125rem 0.5rem;
+            border-radius: 100px;
+        }
+
+        .group-members {
+            padding: 0.625rem 1rem 0.875rem;
+        }
+
+        .group-member {
+            padding: 0.375rem 0;
+            font-size: 0.875rem;
+            color: var(--slate-700);
+            border-bottom: 1px solid var(--slate-100);
+        }
+
+        .group-member:last-child {
+            border-bottom: none;
+        }
+
+        /* Group colors */
+        .group-1 .group-header { background: var(--accent); }
+        .group-2 .group-header { background: var(--blue-500); }
+        .group-3 .group-header { background: var(--purple-500); }
+        .group-4 .group-header { background: var(--orange-500); }
+        .group-5 .group-header { background: var(--pink-500); }
+        .group-6 .group-header { background: var(--teal-500); }
+        .group-7 .group-header { background: var(--indigo-500); }
+        .group-8 .group-header { background: var(--amber-500); }
+        .group-9 .group-header { background: var(--cyan-500); }
+        .group-10 .group-header { background: var(--slate-600); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .quote {
+            font-size: 0.875rem;
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-link {
+                position: static;
+                margin-bottom: 0.75rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+            }
+            
+            .names-list {
+                min-height: 120px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .main {
+                padding: 1.25rem 1rem 2rem;
+            }
+            
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-row {
+                flex-direction: column;
+            }
+            
+            .summary-bar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://onderconstructie.github.io/projectmanagement/" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Projectmanagement
+        </a>
+        <div class="header-content">
+            <div class="logo">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="16" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+                    <circle cx="12" cy="13" r="3.5" fill="#10b981"/>
+                    <circle cx="28" cy="13" r="3.5" fill="#10b981"/>
+                    <circle cx="12" cy="27" r="3.5" fill="#10b981" opacity="0.6"/>
+                    <circle cx="28" cy="27" r="3.5" fill="#10b981" opacity="0.6"/>
+                    <line x1="20" y1="5" x2="20" y2="35" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>De Sociale Mixer</h1>
+                <p>Verdeel willekeurig in groepen</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="main-grid">
+            <!-- Left: Input -->
+            <div class="card">
+                <p class="card-title">Deelnemers</p>
+                
+                <div class="input-section">
+                    <div class="input-group">
+                        <input type="text" class="input-field" id="nameInput" placeholder="Namen invoeren (komma's)" autocomplete="off">
+                        <button class="btn btn-primary btn-icon" id="addBtn" title="Toevoegen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="names-list" id="namesList">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <p>Nog geen deelnemers toegevoegd</p>
+                        </div>
+                    </div>
+                    
+                    <p class="names-count"><span id="namesCount">0</span> deelnemers</p>
+
+                    <div class="group-control">
+                        <div class="group-control-label">Aantal groepen</div>
+                        <div class="number-control">
+                            <button id="decreaseGroups">−</button>
+                            <input type="number" id="groupCount" value="2" min="2" max="20">
+                            <button id="increaseGroups">+</button>
+                        </div>
+                    </div>
+
+                    <div class="division-warning" id="divisionWarning">
+                        <div class="division-warning-header">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <span class="division-warning-title" id="warningTitle">Niet gelijk deelbaar</span>
+                        </div>
+                        <p class="division-warning-text" id="warningText"></p>
+                        <div class="division-options" id="divisionOptions"></div>
+                    </div>
+
+                    <button class="btn btn-primary btn-shuffle" id="shuffleBtn" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 3 21 3 21 8"/>
+                            <line x1="4" y1="20" x2="21" y2="3"/>
+                            <polyline points="21 16 21 21 16 21"/>
+                            <line x1="15" y1="15" x2="21" y2="21"/>
+                            <line x1="4" y1="4" x2="9" y2="9"/>
+                        </svg>
+                        Mixen
+                    </button>
+
+                    <div class="action-row">
+                        <button class="btn btn-secondary" id="reshuffleBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                <path d="M3 3v5h5"/>
+                            </svg>
+                            Opnieuw
+                        </button>
+                        <button class="btn btn-danger" id="clearBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            Wissen
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="card results-card">
+                <p class="card-title">Groepsindeling</p>
+                
+                <div class="summary-bar" id="summaryBar" style="display: none;">
+                    <span class="summary-text" id="summaryText"></span>
+                    <button class="btn btn-copy" id="copyBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Kopiëren
+                    </button>
+                </div>
+
+                <div class="groups-container" id="groupsContainer">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <p>Voeg deelnemers toe en klik op Mixen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p class="quote">Het toeval brengt samen wie bij elkaar hoort.</p>
+    </footer>
+
+    <script>
+        // State
+        let names = [];
+        let groups = [];
+
+        // Colors for names list
+        const listColors = [
+            '#10b981', '#3b82f6', '#8b5cf6', '#f97316', 
+            '#ec4899', '#14b8a6', '#6366f1', '#f59e0b'
+        ];
+
+        // Elements
+        const nameInput = document.getElementById('nameInput');
+        const addBtn = document.getElementById('addBtn');
+        const namesList = document.getElementById('namesList');
+        const namesCount = document.getElementById('namesCount');
+        const groupCountInput = document.getElementById('groupCount');
+        const decreaseBtn = document.getElementById('decreaseGroups');
+        const increaseBtn = document.getElementById('increaseGroups');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const reshuffleBtn = document.getElementById('reshuffleBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const divisionWarning = document.getElementById('divisionWarning');
+        const warningTitle = document.getElementById('warningTitle');
+        const warningText = document.getElementById('warningText');
+        const divisionOptions = document.getElementById('divisionOptions');
+        const groupsContainer = document.getElementById('groupsContainer');
+        const summaryBar = document.getElementById('summaryBar');
+        const summaryText = document.getElementById('summaryText');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Update names list
+        function updateNamesList() {
+            if (names.length === 0) {
+                namesList.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <p>Nog geen deelnemers toegevoegd</p>
+                    </div>
+                `;
+            } else {
+                namesList.innerHTML = names.map((name, i) => `
+                    <div class="name-item">
+                        <span class="name-color" style="background: ${listColors[i % listColors.length]}"></span>
+                        <span class="name-text">${name}</span>
+                        <button class="name-remove" onclick="removeName(${i})" title="Verwijderen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            namesCount.textContent = names.length;
+            updateShuffleButton();
+            checkDivision();
+        }
+
+        // Update shuffle button state
+        function updateShuffleButton() {
+            const groupCount = parseInt(groupCountInput.value);
+            shuffleBtn.disabled = names.length < 2 || groupCount < 2 || groupCount > names.length;
+        }
+
+        // Check if division is possible
+        function checkDivision() {
+            const n = names.length;
+            const g = parseInt(groupCountInput.value);
+            
+            if (n < 2 || g < 2) {
+                divisionWarning.classList.remove('show');
+                return;
+            }
+
+            if (n < g) {
+                warningTitle.textContent = 'Te weinig deelnemers';
+                warningText.textContent = `Je hebt ${n} deelnemers maar wilt ${g} groepen. Voeg meer deelnemers toe of verlaag het aantal groepen.`;
+                divisionOptions.innerHTML = '';
+                divisionWarning.classList.add('show');
+                return;
+            }
+
+            const remainder = n % g;
+            
+            if (remainder === 0) {
+                divisionWarning.classList.remove('show');
+            } else {
+                warningTitle.textContent = 'Niet gelijk deelbaar';
+                const perGroup = Math.floor(n / g);
+                const groupsWithExtra = remainder;
+                
+                warningText.textContent = `${n} deelnemers in ${g} groepen: ${g - groupsWithExtra}× groep van ${perGroup} en ${groupsWithExtra}× groep van ${perGroup + 1}.`;
+                
+                // Find divisible options
+                const divisors = [];
+                for (let i = 2; i <= Math.min(n, 12); i++) {
+                    if (n % i === 0 && i !== g) {
+                        divisors.push(i);
+                    }
+                }
+                
+                let optionsHtml = `<button class="division-option selected" onclick="selectOption('uneven', this)">Doorgaan</button>`;
+                
+                divisors.forEach(d => {
+                    optionsHtml += `<button class="division-option" onclick="selectOption(${d}, this)">${d} groepen van ${n/d}</button>`;
+                });
+                
+                divisionOptions.innerHTML = optionsHtml;
+                divisionWarning.classList.add('show');
+            }
+        }
+
+        // Select division option
+        function selectOption(option, element) {
+            document.querySelectorAll('.division-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            if (option !== 'uneven') {
+                groupCountInput.value = option;
+                checkDivision();
+            }
+            updateShuffleButton();
+        }
+
+        // Add names
+        function addName() {
+            const input = nameInput.value;
+            const newNames = input.split(',')
+                .map(n => n.trim())
+                .filter(n => n && !names.includes(n));
+            
+            if (newNames.length > 0) {
+                newNames.forEach(name => names.push(name));
+                nameInput.value = '';
+                updateNamesList();
+            }
+            nameInput.focus();
+        }
+
+        // Remove name
+        function removeName(index) {
+            names.splice(index, 1);
+            updateNamesList();
+        }
+
+        // Shuffle array (Fisher-Yates)
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Divide into groups
+        function divideIntoGroups() {
+            const groupCount = parseInt(groupCountInput.value);
+            const shuffled = shuffle(names);
+            
+            groups = Array.from({ length: groupCount }, () => []);
+            
+            shuffled.forEach((name, index) => {
+                groups[index % groupCount].push(name);
+            });
+            
+            renderGroups();
+        }
+
+        // Render groups
+        function renderGroups() {
+            if (groups.length === 0) {
+                groupsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <p>Voeg deelnemers toe en klik op Mixen</p>
+                    </div>
+                `;
+                summaryBar.style.display = 'none';
+                return;
+            }
+
+            const totalMembers = groups.reduce((sum, g) => sum + g.length, 0);
+            summaryText.innerHTML = `<strong>${totalMembers}</strong> deelnemers verdeeld in <strong>${groups.length}</strong> groepen`;
+            summaryBar.style.display = 'flex';
+
+            groupsContainer.innerHTML = groups.map((group, index) => `
+                <div class="group-card group-${(index % 10) + 1}">
+                    <div class="group-header">
+                        <span>Groep ${index + 1}</span>
+                        <span class="count">${group.length}</span>
+                    </div>
+                    <div class="group-members">
+                        ${group.map(name => `<div class="group-member">${name}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            let text = '';
+            groups.forEach((group, index) => {
+                text += `Groep ${index + 1}:\n`;
+                group.forEach(name => {
+                    text += `  • ${name}\n`;
+                });
+                text += '\n';
+            });
+            
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Gekopieerd
+                `;
+                copyBtn.style.color = 'var(--accent)';
+                copyBtn.style.borderColor = 'var(--accent)';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.color = '';
+                    copyBtn.style.borderColor = '';
+                }, 1500);
+            });
+        }
+
+        // Reshuffle
+        function reshuffle() {
+            if (names.length >= 2) {
+                divideIntoGroups();
+            }
+        }
+
+        // Clear all
+        function clearAll() {
+            names = [];
+            groups = [];
+            groupCountInput.value = 2;
+            updateNamesList();
+            renderGroups();
+        }
+
+        // Event listeners
+        addBtn.addEventListener('click', addName);
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addName();
+        });
+
+        decreaseBtn.addEventListener('click', () => {
+            const current = parseInt(groupCountInput.value);
+            if (current > 2) {
+                groupCountInput.value = current - 1;
+                checkDivision();
+                updateShuffleButton();
+            }
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            const current = parseInt(groupCountInput.value);
+            if (current < 20) {
+                groupCountInput.value = current + 1;
+                checkDivision();
+                updateShuffleButton();
+            }
+        });
+
+        groupCountInput.addEventListener('change', () => {
+            let val = parseInt(groupCountInput.value);
+            if (isNaN(val) || val < 2) val = 2;
+            if (val > 20) val = 20;
+            groupCountInput.value = val;
+            checkDivision();
+            updateShuffleButton();
+        });
+
+        shuffleBtn.addEventListener('click', divideIntoGroups);
+        reshuffleBtn.addEventListener('click', reshuffle);
+        clearBtn.addEventListener('click', clearAll);
+        copyBtn.addEventListener('click', copyToClipboard);
+
+        // Initialize
+        updateNamesList();
+        renderGroups();
+    </script>
+</body>
+</html>
