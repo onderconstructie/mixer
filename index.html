@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>De Sociale Mixer – Verdeel willekeurig in groepen</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>De Sociale Mixer – Onder Constructie</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23f0fdf4' stroke='%2310b981' stroke-width='2'/%3E%3Ccircle cx='10' cy='11' r='3' fill='%2310b981'/%3E%3Ccircle cx='22' cy='11' r='3' fill='%2310b981'/%3E%3Ccircle cx='10' cy='21' r='3' fill='%2310b981' opacity='0.6'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%2310b981' opacity='0.6'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%2310b981' stroke-width='1.5' stroke-dasharray='2 2'/%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -672,6 +673,25 @@
                 text-align: center;
             }
         }
+    
+        /* Onder Constructie: gedeelde footer en quote (huisstijl) */
+        footer.oc-footer {
+            text-align: center;
+            padding: 2rem 1.5rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #10b981;
+        }
+
+        footer.oc-footer .oc-quote {
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            color: #10b981;
+            opacity: 1;
+            font-style: normal;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -812,8 +832,8 @@
         </div>
     </main>
 
-    <footer class="footer">
-        <p class="quote">Het toeval brengt samen wie bij elkaar hoort.</p>
+    <footer class="footer oc-footer">
+        <p class="quote oc-quote">Het toeval brengt samen wie bij elkaar hoort.</p>
     </footer>
 
     <script>
