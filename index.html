@@ -729,19 +729,71 @@
         .oc-import:focus-visible { outline: 2px solid #10b981; outline-offset: 2px; }
         .oc-import svg { width: 15px; height: 15px; }
         .oc-import[hidden] { display: none; }
+    
+        /* ===== Huisstijl oktober 2026: kop (patroon B), contrast, focus, tikdoelen ===== */
+        .oc-head { display:block; text-align:center; background:#fff; border-bottom:1px solid #e2e8f0; padding:1.5rem 1.25rem 1.75rem; position:relative; }
+        .oc-head .back-link { position:absolute; top:0.875rem; left:1rem; min-height:44px; display:inline-flex; align-items:center; gap:0.5rem; padding:0 0.5rem; margin:0; font-size:0.875rem; color:#64748b; text-decoration:none; border-radius:8px; transition:color 0.2s; }
+        .oc-head .back-link:hover { color:#047857; }
+        .oc-head .back-link svg { width:16px; height:16px; flex:none; }
+        .oc-head .logo { display:block; width:56px; height:56px; margin:0 auto; }
+        .oc-head .logo svg { display:block; width:56px; height:56px; }
+        .oc-head .title { font-size:1.625rem; font-weight:700; color:#1e293b; letter-spacing:-0.03em; line-height:1.2; margin:0.5rem 0 0.25rem; }
+        .oc-head .subtitle { font-size:0.9375rem; color:#64748b; max-width:520px; margin:0 auto; }
+        @media (max-width:640px) {
+            .oc-head { padding-top:0.5rem; }
+            .oc-head .back-link { position:static; margin:0 auto 0.375rem; }
+        }
+        footer.oc-footer, footer.oc-footer .oc-quote, .footer .quote { color:#047857; }
+        :focus-visible { outline:2px solid #047857 !important; outline-offset:2px; }
+        input[type=range]:focus-visible { outline:2px solid #047857 !important; outline-offset:4px; }
+        .oc-import { color:#047857; min-height:44px; }
+        .oc-import:focus-visible { outline-color:#047857; }
+        .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+        .card-title, .names-count, .empty-state { color:#64748b; }
+        .btn { min-height:44px; }
+        .btn-primary { background:#047857; color:#fff; min-height:44px; border-radius:10px; font-size:15px; padding:0 1.25rem; }
+        .btn-primary:hover:not(:disabled) { background:#065f46; box-shadow:none; }
+        .btn-primary.btn-icon { min-width:44px; padding:0; }
+        .btn-shuffle { padding:0 1.25rem; font-size:15px; }
+        .action-row .btn { min-height:44px; }
+        .btn-danger { color:#b91c1c; }
+        .btn-copy { min-height:44px; }
+        .btn-copy:hover { border-color:#047857; color:#047857; }
+        .summary-text strong { color:#047857; }
+        .division-option { min-height:44px; }
+        .division-option:hover, .division-option.selected { border-color:#047857; color:#047857; }
+        .group-control-label { display:block; }
+        .number-control:focus-within { border-color:#047857; }
+        .number-control input:focus-visible { outline-offset:-3px; }
+        .name-item { padding-top:0; padding-bottom:0; min-height:40px; }
+        .name-remove { width:44px; height:44px; margin-right:-0.5rem; }
+        .name-remove svg { width:16px; height:16px; }
+        @media (hover:none) { .name-remove { opacity:1; } }
+        .name-remove:focus-visible { opacity:1; }
+        .group-1 .group-header { background:#047857; }
+        .group-2 .group-header { background:#1d4ed8; }
+        .group-3 .group-header { background:#6d28d9; }
+        .group-4 .group-header { background:#c2410c; }
+        .group-5 .group-header { background:#be185d; }
+        .group-6 .group-header { background:#0f766e; }
+        .group-7 .group-header { background:#4338ca; }
+        .group-8 .group-header { background:#b45309; }
+        .group-9 .group-header { background:#0e7490; }
+        .group-10 .group-header { background:#475569; }
+        .group-header .count { opacity:1; background:rgba(15,23,42,0.22); }
+        .division-warning-title { color:#b91c1c; }
+        .division-warning-header svg { color:#b91c1c; }
     </style>
 </head>
 <body>
-    <header class="header">
-        <a href="https://onderconstructie.github.io/projectmanagement/" class="back-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
+    <header class="header oc-head">
+        <a href="https://onderconstructie.github.io/projectmanagement/" class="back-link" aria-label="Terug naar Projectmanagement">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Projectmanagement
         </a>
-        <div class="header-content">
-            <div class="logo">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="20" cy="20" r="16" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
                     <circle cx="12" cy="13" r="3.5" fill="#10b981"/>
                     <circle cx="28" cy="13" r="3.5" fill="#10b981"/>
@@ -749,12 +801,9 @@
                     <circle cx="28" cy="27" r="3.5" fill="#10b981" opacity="0.6"/>
                     <line x1="20" y1="5" x2="20" y2="35" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3"/>
                 </svg>
-            </div>
-            <div class="header-text">
-                <h1>De Sociale Mixer</h1>
-                <p>Verdeel willekeurig in groepen</p>
-            </div>
         </div>
+        <h1 class="title">De Sociale Mixer</h1>
+        <p class="subtitle">Verdeel willekeurig in groepen.</p>
     </header>
 
     <main class="main">
@@ -765,8 +814,8 @@
                 
                 <div class="input-section">
                     <div class="input-group">
-                        <input type="text" class="input-field" id="nameInput" placeholder="Namen invoeren (komma's)" autocomplete="off">
-                        <button class="btn btn-primary btn-icon" id="addBtn" title="Toevoegen">
+                        <input type="text" class="input-field" id="nameInput" placeholder="Namen invoeren (komma's)" autocomplete="off" aria-label="Namen toevoegen, gescheiden door komma's">
+                        <button class="btn btn-primary btn-icon" id="addBtn" type="button" title="Toevoegen" aria-label="Namen toevoegen">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M12 5v14M5 12h14"/>
                             </svg>
@@ -793,11 +842,11 @@
                     <p class="names-count"><span id="namesCount">0</span> deelnemers</p>
 
                     <div class="group-control">
-                        <div class="group-control-label">Aantal groepen</div>
+                        <label class="group-control-label" for="groupCount">Aantal groepen</label>
                         <div class="number-control">
-                            <button id="decreaseGroups">−</button>
+                            <button id="decreaseGroups" type="button" aria-label="Eén groep minder">−</button>
                             <input type="number" id="groupCount" value="2" min="2" max="20">
-                            <button id="increaseGroups">+</button>
+                            <button id="increaseGroups" type="button" aria-label="Eén groep meer">+</button>
                         </div>
                     </div>
 
@@ -891,7 +940,7 @@
     <div class="oc-toast" id="ocToast" role="status" aria-live="polite"></div>
 
     <script>
-/* ---------- Overnemen tussen tools (gedeeld door de Onder Constructie-tools, v1) ----------
+/* ---------- Overnemen tussen tools (gedeeld door de Onder Constructie-tools, v2) ----------
    Alle tools draaien op hetzelfde domein en delen dus localStorage. Elke tool legt wat hij te bieden
    heeft klaar onder 'oc.share.<tool-id>', in een vaste vorm, zodat andere tools het kunnen overnemen
    zonder elkaars binnenkant te kennen.
@@ -929,20 +978,23 @@ const ocShare = (() => {
   }
   function clear(id) { try { localStorage.removeItem(PREFIX + id); } catch {} }
 
+  // Elke bron apart: één kapotte sleutel mag de andere niet verbergen.
   function sources(types, self) {
     const out = [];
-    try {
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (!k || !k.startsWith(PREFIX) || k === PREFIX + self) continue;
+    let keys = [];
+    try { for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i)); } catch { return out; }
+    keys.forEach(k => {
+      if (!k || !k.startsWith(PREFIX) || k === PREFIX + self) return;
+      try {
         const d = JSON.parse(localStorage.getItem(k));
-        if (!d || !Array.isArray(d.lists)) continue;
+        if (!d || !Array.isArray(d.lists)) return;
         d.lists.forEach(l => {
-          const items = l.items.filter(it => types.includes(it.type));
-          if (items.length) out.push({ tool: d.tool || d.id, id: d.id, updated: d.updated, list: l.name, items });
+          if (!l || !Array.isArray(l.items)) return;
+          const items = l.items.filter(it => it && types.includes(it.type) && typeof it.text === 'string');
+          if (items.length) out.push({ tool: String(d.tool || d.id || k.slice(PREFIX.length)), id: d.id, updated: +d.updated || 0, list: String(l.name || ''), items });
         });
-      }
-    } catch {}
+      } catch {}
+    });
     return out.sort((a, b) => (b.updated || 0) - (a.updated || 0));
   }
 
@@ -1024,7 +1076,7 @@ const ocShare = (() => {
 
   // Hoeveel er klaarligt voor deze soorten (om een knop te tonen of een teller te zetten).
   const count = (types, self) => sources(types, self).reduce((n, s) => n + s.items.length, 0);
-  return { publish, clear, pick, count, sources };
+  return { publish, clear, pick, count, sources, esc };
 })();
 /* ---------- Download als afbeelding of PDF (gedeeld door de Onder Constructie-tools, v2) ----------
    Gebruik:
@@ -1173,9 +1225,9 @@ const ocExport = (() => {
                 namesList.innerHTML = names.map((name, i) => `
                     <div class="name-item">
                         <span class="name-color" style="background: ${listColors[i % listColors.length]}"></span>
-                        <span class="name-text">${name}</span>
-                        <button class="name-remove" onclick="removeName(${i})" title="Verwijderen">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <span class="name-text">${ocShare.esc(name)}</span>
+                        <button class="name-remove" type="button" data-remove="${i}" title="Verwijderen" aria-label="Verwijder ${ocShare.esc(name)}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M18 6L6 18M6 6l12 12"/>
                             </svg>
                         </button>
@@ -1230,10 +1282,10 @@ const ocExport = (() => {
                     }
                 }
                 
-                let optionsHtml = `<button class="division-option selected" onclick="selectOption('uneven', this)">Doorgaan</button>`;
+                let optionsHtml = `<button type="button" class="division-option selected" data-opt="uneven">Doorgaan</button>`;
                 
                 divisors.forEach(d => {
-                    optionsHtml += `<button class="division-option" onclick="selectOption(${d}, this)">${d} groepen van ${n/d}</button>`;
+                    optionsHtml += `<button type="button" class="division-option" data-opt="${d}">${d} groepen van ${n/d}</button>`;
                 });
                 
                 divisionOptions.innerHTML = optionsHtml;
@@ -1327,7 +1379,7 @@ const ocExport = (() => {
                         <span class="count">${group.length}</span>
                     </div>
                     <div class="group-members">
-                        ${group.map(name => `<div class="group-member">${name}</div>`).join('')}
+                        ${group.map(name => `<div class="group-member">${ocShare.esc(name)}</div>`).join('')}
                     </div>
                 </div>
             `).join('');
@@ -1363,7 +1415,7 @@ const ocExport = (() => {
         }
 
         /* ---------- Download als afbeelding of PDF ---------- */
-        const GROUP_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#f59e0b', '#06b6d4', '#475569'];
+        const GROUP_COLORS = ['#047857', '#1d4ed8', '#6d28d9', '#c2410c', '#be185d', '#0f766e', '#4338ca', '#b45309', '#0e7490', '#475569'];
         let toastTimer = null;
         function ocToast(msg) {
             const t = document.getElementById('ocToast');
@@ -1381,7 +1433,7 @@ const ocExport = (() => {
                 const color = GROUP_COLORS[i % GROUP_COLORS.length];
                 return `<div data-oc-keep style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
                     <div style="display:flex;justify-content:space-between;align-items:center;background:${color};color:#fff;padding:10px 16px;font-size:17px;font-weight:700">
-                        <span>Groep ${i + 1}</span><span style="font-size:13px;font-weight:600;background:rgba(255,255,255,0.22);border-radius:999px;padding:1px 9px">${group.length}</span>
+                        <span>Groep ${i + 1}</span><span style="font-size:13px;font-weight:600;background:rgba(15,23,42,0.22);border-radius:999px;padding:1px 9px">${group.length}</span>
                     </div>
                     <div style="padding:6px 16px 10px">
                         ${group.map(n => `<div style="font-size:18px;color:#1e293b;padding:7px 0;border-bottom:1px solid #f1f5f9">${escHtml(n)}</div>`).join('')}
@@ -1418,6 +1470,8 @@ const ocExport = (() => {
 
         // Event listeners
         addBtn.addEventListener('click', addName);
+        divisionOptions.addEventListener('click', e => { const b = e.target.closest('[data-opt]'); if (b) selectOption(b.dataset.opt === 'uneven' ? 'uneven' : +b.dataset.opt, b); });
+        namesList.addEventListener('click', e => { const b = e.target.closest('[data-remove]'); if (b) removeName(+b.dataset.remove); });
 
         /* ---------- Namen overnemen uit een andere tool ---------- */
         const importBtn = document.getElementById('importBtn');
