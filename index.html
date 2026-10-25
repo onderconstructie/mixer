@@ -8,7 +8,7 @@
     <meta name="description" content="Verdeel een groep willekeurig in kleinere teams. Kies het aantal groepen en mix.">
     <meta name="oc:groep" content="projecten">
     <meta name="oc:labels" content="vergaderen">
-    <meta name="oc:kort" content="Verdeel een groep in teams">
+    <meta name="oc:kort" content="Verdeel een groep in groepjes">
     <meta name="oc:volgorde" content="50">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E %3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;16&quot; fill=&quot;%23ecfdf5&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;1.5&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;13&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;13&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;27&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot; opacity=&quot;0.6&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;27&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot; opacity=&quot;0.6&quot;/%3E %3Cline x1=&quot;20&quot; y1=&quot;5&quot; x2=&quot;20&quot; y2=&quot;35&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;1.5&quot; stroke-dasharray=&quot;3 3&quot;/%3E %3C/svg%3E">
     <link rel="stylesheet" href="/fonts/fonts.css">
@@ -1089,8 +1089,8 @@ const ocShare = (() => {
    andere tools, zodat de app ze offline kan bewaren. */
 const ocExport = (() => {
   const LIBS = {
-    h2c: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-    pdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+    h2c: '/lib/html2canvas-1.4.1.min.js',
+    pdf: '/lib/jspdf-2.5.1.umd.min.js'
   };
   const A4 = { w: 210, h: 297 }, MARGIN = 10;   // mm
   const loaded = {};
