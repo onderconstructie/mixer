@@ -30,14 +30,6 @@
             --danger: #ef4444;
             --danger-light: #fee2e2;
             --danger-border: #fca5a5;
-            --blue-500: #3b82f6;
-            --purple-500: #8b5cf6;
-            --orange-500: #f97316;
-            --pink-500: #ec4899;
-            --teal-500: #14b8a6;
-            --indigo-500: #6366f1;
-            --amber-500: #f59e0b;
-            --cyan-500: #06b6d4;
         }
 
         * {
@@ -625,17 +617,6 @@
             border-bottom: none;
         }
 
-        /* Group colors */
-        .group-1 .group-header { background: var(--accent); }
-        .group-2 .group-header { background: var(--blue-500); }
-        .group-3 .group-header { background: var(--purple-500); }
-        .group-4 .group-header { background: var(--orange-500); }
-        .group-5 .group-header { background: var(--pink-500); }
-        .group-6 .group-header { background: var(--teal-500); }
-        .group-7 .group-header { background: var(--indigo-500); }
-        .group-8 .group-header { background: var(--amber-500); }
-        .group-9 .group-header { background: var(--cyan-500); }
-        .group-10 .group-header { background: var(--slate-600); }
 
         /* Footer */
         .footer {
@@ -769,16 +750,6 @@
         .name-remove svg { width:16px; height:16px; }
         @media (hover:none) { .name-remove { opacity:1; } }
         .name-remove:focus-visible { opacity:1; }
-        .group-1 .group-header { background:#047857; }
-        .group-2 .group-header { background:#1d4ed8; }
-        .group-3 .group-header { background:#6d28d9; }
-        .group-4 .group-header { background:#c2410c; }
-        .group-5 .group-header { background:#be185d; }
-        .group-6 .group-header { background:#0f766e; }
-        .group-7 .group-header { background:#4338ca; }
-        .group-8 .group-header { background:#b45309; }
-        .group-9 .group-header { background:#0e7490; }
-        .group-10 .group-header { background:#475569; }
         .group-header .count { opacity:1; background:rgba(15,23,42,0.22); }
         /* rustige groepskleuren: groen en grijs, in een vaste reeks */
         .group-1 .group-header, .group-5 .group-header, .group-9 .group-header { background:#047857; color:#fff; }
@@ -1217,11 +1188,6 @@ const ocExport = (() => {
         let isExample = false;   // voorbeeldnamen: niet echt, enkel om de tool te verkennen
         const EXAMPLE_NAMES = ['An', 'Bram', 'Chloë', 'Dries', 'Eline', 'Femke', 'Gilles', 'Hanne', 'Ibrahim', 'Jana', 'Kobe', 'Lotte'];
 
-        // Colors for names list
-        const listColors = [
-            '#10b981', '#3b82f6', '#8b5cf6', '#f97316', 
-            '#ec4899', '#14b8a6', '#6366f1', '#f59e0b'
-        ];
 
         // Elements
         const nameInput = document.getElementById('nameInput');
@@ -1457,12 +1423,15 @@ const ocExport = (() => {
         const GROUP_COLORS = ['#047857', '#10b981', '#334155', '#64748b'];
         const GROUP_TEXT = ['#fff', '#0f172a', '#fff', '#fff'];
         function ocProject(fb) { try { const p = JSON.parse(localStorage.getItem('oc.project')); return p && typeof p.name === 'string' && p.name.trim() ? p.name.trim().slice(0, 80) : fb; } catch { return fb; } }
+        /* Bestandsnaam: tool-project-datum (JJJJ-MM-DD), zonder dubbele datum of dubbele toolnaam */
         function ocFileName(tool, project) {
-            const d = new Date(), iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            const slug = s => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            let p = slug(project).replace(/(^|-)\d{1,4}-\d{1,2}-\d{1,4}(?=-|$)/g, '').replace(/^-+|-+$/g, '').slice(0, 50).replace(/-$/, '');
-            if (p === slug(tool)) p = '';
-            return [slug(tool), p, iso].filter(Boolean).join('-');
+          const d = new Date(), iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          const slug = s => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          const t = slug(tool);
+          let p = slug(project).replace(/(^|-)\d{1,4}-\d{1,2}-\d{1,4}(?=-|$)/g, '').replace(/^-+|-+$/g, '');
+          if (p === t) p = ''; else if (p.startsWith(t + '-')) p = p.slice(t.length + 1);
+          p = p.slice(0, 50).replace(/-+$/, '');
+          return [t, p, iso].filter(Boolean).join('-');
         }
         let toastTimer = null;
         function ocToast(msg) {
