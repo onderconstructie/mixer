@@ -10,7 +10,7 @@
     <meta name="oc:labels" content="vergaderen">
     <meta name="oc:kort" content="Verdeel een groep in willekeurige groepjes">
     <meta name="oc:volgorde" content="50">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox=&quot;0 0 40 40&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E %3Ccircle cx=&quot;20&quot; cy=&quot;20&quot; r=&quot;16&quot; fill=&quot;%23ecfdf5&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;1.5&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;13&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;13&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot;/%3E %3Ccircle cx=&quot;12&quot; cy=&quot;27&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot; opacity=&quot;0.6&quot;/%3E %3Ccircle cx=&quot;28&quot; cy=&quot;27&quot; r=&quot;3.5&quot; fill=&quot;%2310b981&quot; opacity=&quot;0.6&quot;/%3E %3Cline x1=&quot;20&quot; y1=&quot;5&quot; x2=&quot;20&quot; y2=&quot;35&quot; stroke=&quot;%2310b981&quot; stroke-width=&quot;1.5&quot; stroke-dasharray=&quot;3 3&quot;/%3E %3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23f8fafc' stroke='%23e2e8f0' stroke-width='1.5'/%3E%3Cpath d='M9 14h4c5 0 9 12 14 12h3' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M9 26h4c5 0 9-12 14-12h3' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M27 10.5l3.5 3.5-3.5 3.5' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M27 22.5l3.5 3.5-3.5 3.5' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="/fonts/fonts.css">
     <style>
         :root {
@@ -780,6 +780,43 @@
         .group-9 .group-header { background:#0e7490; }
         .group-10 .group-header { background:#475569; }
         .group-header .count { opacity:1; background:rgba(15,23,42,0.22); }
+        /* rustige groepskleuren: groen en grijs, in een vaste reeks */
+        .group-1 .group-header, .group-5 .group-header, .group-9 .group-header { background:#047857; color:#fff; }
+        .group-2 .group-header, .group-6 .group-header, .group-10 .group-header { background:#10b981; color:#0f172a; }
+        .group-3 .group-header, .group-7 .group-header { background:#334155; color:#fff; }
+        .group-4 .group-header, .group-8 .group-header { background:#64748b; color:#fff; }
+        .group-2 .group-header .count, .group-6 .group-header .count, .group-10 .group-header .count { background:rgba(255,255,255,0.45); }
+
+        /* namen als compacte chips */
+        .names-list { display:flex; flex-wrap:wrap; gap:0.375rem; align-content:flex-start; max-height:260px; overflow:auto; flex:0 1 auto; }
+        .names-list .name-item { background:#fff; border:1px solid #e2e8f0; border-radius:999px; padding:0 0 0 0.875rem; min-height:44px; gap:0; max-width:100%; }
+        .names-list .name-item:hover { background:#fff; border-color:#cbd5e1; }
+        .names-list .name-text { flex:0 1 auto; }
+        .names-list .name-remove { margin:0; opacity:1; color:#94a3b8; border-radius:999px; }
+        .empty-state { width:100%; align-self:stretch; }
+        .groups-container > .empty-state { grid-column:1 / -1; }
+        .names-list .empty-state { padding:1.5rem 1rem; }
+        .action-row[hidden] { display:none; }
+
+        /* samenvatting boven, de drie knoppen samen op één rij */
+        .summary-bar { flex-direction:column; align-items:flex-start; }
+        .summary-actions { display:grid; grid-template-columns:repeat(3, auto); justify-content:start; }
+        @media (max-width:640px) {
+            .summary-bar { align-items:stretch; }
+            .summary-actions { grid-template-columns:repeat(3, 1fr); }
+        }
+
+        /* voorbeeld */
+        .ex-btn { margin-top:0.75rem; min-height:44px; padding:0 1rem; border-radius:10px; border:1.5px solid #a7f3d0; background:#fff; color:#047857; font:inherit; font-size:0.875rem; font-weight:600; cursor:pointer; }
+        .ex-btn:hover { background:#ecfdf5; }
+        .vb-bar { display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem 0.75rem; margin:0 0 1rem; padding:0.5rem 0.5rem 0.5rem 0.75rem; background:#fffbeb; border:1px solid #fde68a; border-radius:12px; font-size:0.875rem; line-height:1.4; color:#78350f; }
+        .vb-bar[hidden] { display:none; }
+        .vb-bar svg { width:18px; height:18px; flex-shrink:0; color:#b45309; }
+        .vb-text { flex:1 1 14rem; min-width:0; display:flex; gap:0.5rem; align-items:flex-start; }
+        .vb-btns { display:flex; flex-wrap:wrap; gap:0.375rem; }
+        .vb-btn { min-height:44px; padding:0.375rem 0.625rem; border-radius:10px; font:inherit; font-size:0.875rem; font-weight:600; background:#fff; border:1px solid #e2e8f0; cursor:pointer; }
+        .vb-wis { color:#b91c1c; border-color:#fecaca; }
+        .vb-eigen { color:#047857; border-color:#a7f3d0; }
         .division-warning-title { color:#b91c1c; }
         .division-warning-header svg { color:#b91c1c; }
     </style>
@@ -791,20 +828,17 @@
             Projectmanagement
         </a>
         <div class="logo" aria-hidden="true">
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="20" cy="20" r="16" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
-                    <circle cx="12" cy="13" r="3.5" fill="#10b981"/>
-                    <circle cx="28" cy="13" r="3.5" fill="#10b981"/>
-                    <circle cx="12" cy="27" r="3.5" fill="#10b981" opacity="0.6"/>
-                    <circle cx="28" cy="27" r="3.5" fill="#10b981" opacity="0.6"/>
-                    <line x1="20" y1="5" x2="20" y2="35" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3"/>
-                </svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="18" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/><path d="M9 14h4c5 0 9 12 14 12h3" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/><path d="M9 26h4c5 0 9-12 14-12h3" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/><path d="M27 10.5l3.5 3.5-3.5 3.5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 22.5l3.5 3.5-3.5 3.5" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <h1 class="title">De Sociale Mixer</h1>
         <p class="subtitle">Verdeel een groep in willekeurige groepjes</p>
     </header>
 
     <main class="main">
+            <div class="vb-bar" id="vbBar" hidden>
+                <div class="vb-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Dit is een voorbeeld om de tool te verkennen. Het telt niet mee in andere tools.</span></div>
+                <div class="vb-btns"><button type="button" class="vb-btn vb-wis" id="vbWis">Wis voorbeeld</button><button type="button" class="vb-btn vb-eigen" id="vbEigen">Maak er mijn eigen van</button></div>
+            </div>
         <div class="main-grid">
             <!-- Left: Input -->
             <div class="card">
@@ -834,6 +868,7 @@
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                             </svg>
                             <p>Nog geen deelnemers toegevoegd</p>
+                            <button type="button" class="ex-btn" data-example>Voorbeeld bekijken</button>
                         </div>
                     </div>
                     
@@ -872,7 +907,7 @@
                         Mixen
                     </button>
 
-                    <div class="action-row">
+                    <div class="action-row" id="actionRow" hidden>
                         <button class="btn btn-secondary" id="reshuffleBtn">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
@@ -1179,6 +1214,8 @@ const ocExport = (() => {
         // State
         let names = [];
         let groups = [];
+        let isExample = false;   // voorbeeldnamen: niet echt, enkel om de tool te verkennen
+        const EXAMPLE_NAMES = ['An', 'Bram', 'Chloë', 'Dries', 'Eline', 'Femke', 'Gilles', 'Hanne', 'Ibrahim', 'Jana', 'Kobe', 'Lotte'];
 
         // Colors for names list
         const listColors = [
@@ -1218,12 +1255,12 @@ const ocExport = (() => {
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                         <p>Nog geen deelnemers toegevoegd</p>
+                        <button type="button" class="ex-btn" data-example>Voorbeeld bekijken</button>
                     </div>
                 `;
             } else {
                 namesList.innerHTML = names.map((name, i) => `
                     <div class="name-item">
-                        <span class="name-color" style="background: ${listColors[i % listColors.length]}"></span>
                         <span class="name-text">${ocShare.esc(name)}</span>
                         <button class="name-remove" type="button" data-remove="${i}" title="Verwijderen" aria-label="Verwijder ${ocShare.esc(name)}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -1234,6 +1271,9 @@ const ocExport = (() => {
                 `).join('');
             }
             namesCount.textContent = names.length;
+            if (!names.length) isExample = false;
+            document.getElementById('vbBar').hidden = !isExample;
+            document.getElementById('actionRow').hidden = names.length === 0;
             updateShuffleButton();
             checkDivision();
         }
@@ -1414,7 +1454,16 @@ const ocExport = (() => {
         }
 
         /* ---------- Download als afbeelding of PDF ---------- */
-        const GROUP_COLORS = ['#047857', '#1d4ed8', '#6d28d9', '#c2410c', '#be185d', '#0f766e', '#4338ca', '#b45309', '#0e7490', '#475569'];
+        const GROUP_COLORS = ['#047857', '#10b981', '#334155', '#64748b'];
+        const GROUP_TEXT = ['#fff', '#0f172a', '#fff', '#fff'];
+        function ocProject(fb) { try { const p = JSON.parse(localStorage.getItem('oc.project')); return p && typeof p.name === 'string' && p.name.trim() ? p.name.trim().slice(0, 80) : fb; } catch { return fb; } }
+        function ocFileName(tool, project) {
+            const d = new Date(), iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            const slug = s => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            let p = slug(project).replace(/(^|-)\d{1,4}-\d{1,2}-\d{1,4}(?=-|$)/g, '').replace(/^-+|-+$/g, '').slice(0, 50).replace(/-$/, '');
+            if (p === slug(tool)) p = '';
+            return [slug(tool), p, iso].filter(Boolean).join('-');
+        }
         let toastTimer = null;
         function ocToast(msg) {
             const t = document.getElementById('ocToast');
@@ -1429,9 +1478,9 @@ const ocExport = (() => {
             const node = document.createElement('div');
             node.style.cssText = `display:grid;grid-template-columns:repeat(${cols}, 1fr);gap:18px;align-items:start;`;
             node.innerHTML = groups.map((group, i) => {
-                const color = GROUP_COLORS[i % GROUP_COLORS.length];
+                const color = GROUP_COLORS[i % GROUP_COLORS.length], fg = GROUP_TEXT[i % GROUP_TEXT.length];
                 return `<div data-oc-keep style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
-                    <div style="display:flex;justify-content:space-between;align-items:center;background:${color};color:#fff;padding:10px 16px;font-size:17px;font-weight:700">
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:${color};color:${fg};padding:10px 16px;font-size:17px;font-weight:700">
                         <span>Groep ${i + 1}</span><span style="font-size:13px;font-weight:600;background:rgba(15,23,42,0.22);border-radius:999px;padding:1px 9px">${group.length}</span>
                     </div>
                     <div style="padding:6px 16px 10px">
@@ -1443,7 +1492,7 @@ const ocExport = (() => {
         async function doExport(kind) {
             if (!groups.length) { ocToast('Mix eerst de groepen'); return; }
             const landscape = groups.length >= 4;
-            const name = 'groepen-' + new Date().toISOString().slice(0, 10);
+            const name = ocFileName('mixer', ocProject(''));
             ocToast('Bezig…');
             try {
                 await (kind === 'png' ? ocExport.png(buildExport, name, { landscape }) : ocExport.pdf(buildExport, name, { landscape }));
@@ -1461,6 +1510,7 @@ const ocExport = (() => {
         // Clear all
         function clearAll() {
             names = [];
+            isExample = false;
             groups = [];
             groupCountInput.value = 2;
             updateNamesList();
@@ -1470,7 +1520,12 @@ const ocExport = (() => {
         // Event listeners
         addBtn.addEventListener('click', addName);
         divisionOptions.addEventListener('click', e => { const b = e.target.closest('[data-opt]'); if (b) selectOption(b.dataset.opt === 'uneven' ? 'uneven' : +b.dataset.opt, b); });
-        namesList.addEventListener('click', e => { const b = e.target.closest('[data-remove]'); if (b) removeName(+b.dataset.remove); });
+        namesList.addEventListener('click', e => {
+            if (e.target.closest('[data-example]')) { names = EXAMPLE_NAMES.slice(); groups = []; isExample = true; groupCountInput.value = 3; updateNamesList(); renderGroups(); return; }
+            const b = e.target.closest('[data-remove]'); if (b) removeName(+b.dataset.remove);
+        });
+        document.getElementById('vbWis').addEventListener('click', clearAll);
+        document.getElementById('vbEigen').addEventListener('click', () => { isExample = false; updateNamesList(); ocToast('Het voorbeeld is nu van jou'); });
 
         /* ---------- Namen overnemen uit een andere tool ---------- */
         const importBtn = document.getElementById('importBtn');
