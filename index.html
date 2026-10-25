@@ -189,9 +189,7 @@
         /* Names list */
         .names-list {
             flex: 1;
-            min-height: 180px;
-            max-height: 240px;
-            overflow-y: auto;
+            min-height: 120px;
             margin-bottom: 1rem;
             background: var(--slate-50);
             border-radius: 10px;
@@ -1521,8 +1519,11 @@ const ocExport = (() => {
             updateShuffleButton();
         });
 
-        shuffleBtn.addEventListener('click', divideIntoGroups);
-        reshuffleBtn.addEventListener('click', reshuffle);
+        // Na het mixen de groepen in beeld brengen (op een gsm staan ze onder de namen)
+        const showResults = () => setTimeout(() => { const r = document.querySelector('.results-card'); if (!r) return; const b = r.getBoundingClientRect();
+            if (b.top > innerHeight * 0.4 || b.bottom < 80) r.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start' }); }, 60);
+        shuffleBtn.addEventListener('click', () => { divideIntoGroups(); showResults(); });
+        reshuffleBtn.addEventListener('click', () => { reshuffle(); showResults(); });
         clearBtn.addEventListener('click', clearAll);
         copyBtn.addEventListener('click', copyToClipboard);
         document.getElementById('exportPng').addEventListener('click', () => doExport('png'));
