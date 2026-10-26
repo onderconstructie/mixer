@@ -826,7 +826,9 @@
         .oc-toast { display:flex; align-items:center; gap:0.75rem; }
         .oc-toast button { min-height:44px; padding:0 0.625rem; border:0; background:none; color:#6ee7b7; font:inherit; font-weight:600; border-radius:8px; cursor:pointer; }
         .oc-toast button[hidden] { display:none; }
-    </style>
+    
+.oc-groot{width:44px;height:44px;min-width:44px;padding:0!important;display:inline-flex!important;align-items:center;justify-content:center;gap:0!important;flex:0 0 auto}.oc-groot svg{width:20px;height:20px;margin:0!important}
+</style>
 </head>
 <body>
     <header class="header oc-head">
@@ -948,7 +950,7 @@
                 <div class="summary-bar" id="summaryBar" style="display: none;">
                     <div class="summary-top">
                         <span class="summary-text" id="summaryText"></span>
-                        <button class="btn btn-primary present-btn" id="presentBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Toon op groot scherm</button>
+                        <button class="btn btn-primary present-btn oc-groot" id="presentBtn" type="button" title="Toon op groot scherm" aria-label="Toon op groot scherm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
                     </div>
                     <div class="summary-actions">
                     <button class="btn btn-copy" id="copyBtn">
@@ -1751,5 +1753,28 @@ const ocExport = (() => {
         syncPrev();
         persist(true);
     </script>
+<script>
+/* oc-sync: reageert op "Afsluiten" in de app (ook in andere tabbladen) en geeft Esc door aan de app */
+(function () {
+  if (window.__ocSync) return; window.__ocSync = true;
+  var gewist = false;
+  function wis() {
+    if (gewist) return; gewist = true;
+    try { var orig = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if (k === 'oc.wis') return orig.call(this, k, v); }; } catch (e) {}
+    try { document.body.innerHTML = '<p role="status" style="font-family:\'DM Sans\',system-ui,sans-serif;padding:3rem 1.5rem;text-align:center;color:#475569;font-size:1.0625rem">Alles is gewist op dit toestel. Deze pagina laadt opnieuw…</p>'; } catch (e) {}
+    setTimeout(function () { location.reload(); }, 400);
+  }
+  try { var bc = new BroadcastChannel('oc-sync'); bc.onmessage = function (e) { if (e.data && e.data.type === 'wis') wis(); }; } catch (e) {}
+  addEventListener('storage', function (e) { if (e.key === 'oc.wis' || e.key === null) wis(); });
+  if (window.parent === window) return;
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    var a = document.activeElement;
+    if (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return;
+    if (document.querySelector('dialog[open], [role="dialog"]:not([hidden]):not([aria-hidden="true"]), [aria-modal="true"]:not([hidden]), [aria-expanded="true"], .open, .show, .active.modal, .is-open')) return;
+    try { parent.postMessage({ type: 'oc-esc' }, location.origin); } catch (err) {}
+  }, true);
+})();
+</script>
 </body>
 </html>
