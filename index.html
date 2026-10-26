@@ -44,7 +44,7 @@
             background: var(--slate-50);
             color: var(--slate-700);
             line-height: 1.6;
-            min-height: 100vh;
+            min-height: 100vh; min-height: 100dvh;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -828,6 +828,13 @@
         .oc-toast button[hidden] { display:none; }
     
 .oc-groot{width:44px;height:44px;min-width:44px;padding:0!important;display:inline-flex!important;align-items:center;justify-content:center;gap:0!important;flex:0 0 auto}.oc-groot svg{width:20px;height:20px;margin:0!important}
+
+/* Soepel op gsm: geen tikvertraging, zichtbare tikfeedback, vensters scrollen de pagina niet mee */
+a, button, summary, select, label, [role="button"], [role="tab"] { touch-action: manipulation; }
+button:not(:disabled):active, summary:active, [role="button"]:active { filter: brightness(0.93); }
+dialog, [role="dialog"], [role="alertdialog"], .modal, .modal-backdrop { overscroll-behavior: contain; }
+html { -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) { .input-field { font-size: 1rem; } }
 </style>
 </head>
 <body>
@@ -855,7 +862,7 @@
                 
                 <div class="input-section">
                     <div class="input-group">
-                        <input type="text" class="input-field" id="nameInput" placeholder="Namen invoeren (komma's)" autocomplete="off" aria-label="Namen toevoegen, gescheiden door komma's">
+                        <input type="text" class="input-field" id="nameInput" placeholder="Namen invoeren (komma's)" autocomplete="off" enterkeyhint="enter" autocapitalize="words" aria-label="Namen toevoegen, gescheiden door komma's">
                         <button class="btn btn-primary btn-icon" id="addBtn" type="button" title="Toevoegen" aria-label="Namen toevoegen">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                 <path d="M12 5v14M5 12h14"/>
