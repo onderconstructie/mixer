@@ -797,6 +797,9 @@
         .mode { display:flex; gap:0.25rem; background:#fff; border:1.5px solid #e2e8f0; border-radius:10px; padding:3px; margin-bottom:0.75rem; }
         .mode button { flex:1; min-height:44px; border:0; background:none; border-radius:8px; font:inherit; font-size:0.8125rem; font-weight:600; color:#475569; cursor:pointer; padding:0 0.375rem; }
         .mode button[aria-pressed="true"] { background:#1e293b; color:#fff; }
+        .name-remove { min-width:44px; justify-content:center; }
+        .group-member { overflow-wrap:anywhere; }
+        .summary-text .stale { display:block; margin-top:0.125rem; font-size:0.8125rem; font-weight:600; color:#b45309; }
         @media (forced-colors: active) { .mode button[aria-pressed="true"], .division-option[aria-pressed="true"] { border:2px solid Highlight; } }
         .prev-btn { margin-top:-0.5rem; }
         .oc-import + .oc-import { margin-top:-0.5rem; }
@@ -1319,6 +1322,7 @@ const ocExport = (() => {
             document.getElementById('actionRow').hidden = names.length === 0;
             updateShuffleButton();
             checkDivision();
+            renderSummary();
         }
 
         // Update shuffle button state
@@ -1344,7 +1348,9 @@ const ocExport = (() => {
                 } else {
                     const base = Math.floor(n / gs), extra = n % gs;
                     warningTitle.textContent = 'Niet gelijk deelbaar';
-                    warningText.textContent = `${n} deelnemers in groepjes van ${size}: ${gs - extra}× groepje van ${base} en ${extra}× groepje van ${base + 1}.`;
+                    warningText.textContent = extra
+                        ? `${n} deelnemers in groepjes van ${size}: ${gs - extra}× groepje van ${base} en ${extra}× groepje van ${base + 1}.`
+                        : `${n} deelnemers in groepjes van ${size}: dat worden ${gs} groepjes van ${base}.`;
                 }
                 divisionOptions.innerHTML = '';
                 divisionWarning.classList.add('show');
@@ -1410,12 +1416,13 @@ const ocExport = (() => {
         // Add names
         function addName() {
             const input = nameInput.value;
-            const newNames = input.split(',')
-                .map(n => n.trim())
-                .filter(n => n && !names.includes(n));
+            // Komma, puntkomma, tab of nieuwe regel: zo werkt ook een geplakte lijst uit een mail of rekenblad
+            const newNames = [...new Set(input.split(/[,;\t\r\n]+/)
+                .map(n => n.trim().slice(0, 80))
+                .filter(n => n && !names.includes(n)))];
             
             if (newNames.length > 0) {
-                newNames.forEach(name => names.push(name));
+                newNames.slice(0, Math.max(0, 300 - names.length)).forEach(name => names.push(name));
                 nameInput.value = '';
                 updateNamesList();
             }
@@ -1470,8 +1477,7 @@ const ocExport = (() => {
                 return;
             }
 
-            const totalMembers = groups.reduce((sum, g) => sum + g.length, 0);
-            summaryText.innerHTML = `<strong>${totalMembers}</strong> deelnemers verdeeld in <strong>${groups.length}</strong> groepen`;
+            renderSummary();
             summaryBar.style.display = 'flex';
 
             groupsContainer.innerHTML = groups.map((group, index) => `
@@ -1487,6 +1493,16 @@ const ocExport = (() => {
             `).join('');
         }
 
+        // Samenvatting boven de groepjes; meldt het als de namenlijst intussen veranderde
+        function renderSummary() {
+            if (!groups.length) return;
+            const inGroups = groups.flat();
+            const totalMembers = inGroups.length;
+            const stale = inGroups.length !== names.length || inGroups.some(n => !names.includes(n));
+            summaryText.innerHTML = `<strong>${totalMembers}</strong> deelnemers verdeeld in <strong>${groups.length}</strong> groepen`
+                + (stale ? `<span class="stale">De lijst is veranderd. Mix opnieuw.</span>` : '');
+        }
+
         // Copy to clipboard
         function copyToClipboard() {
             let text = '';
@@ -1498,7 +1514,9 @@ const ocExport = (() => {
                 text += '\n';
             });
             
-            navigator.clipboard.writeText(text.trim()).then(() => {
+            const fail = () => ocToast('Kopiëren lukt hier niet. Gebruik Afbeelding of PDF.');
+            if (!navigator.clipboard) { fail(); return; }
+            navigator.clipboard.writeText(text.trim()).catch(() => { fail(); throw 0; }).then(() => {
                 const originalHTML = copyBtn.innerHTML;
                 copyBtn.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
@@ -1513,7 +1531,7 @@ const ocExport = (() => {
                     copyBtn.style.color = '';
                     copyBtn.style.borderColor = '';
                 }, 1500);
-            });
+            }).catch(() => {});
         }
 
         /* ---------- Download als afbeelding of PDF ---------- */
@@ -1561,7 +1579,8 @@ const ocExport = (() => {
                         ${group.map(n => `<div style="font-size:18px;color:#1e293b;padding:7px 0;border-bottom:1px solid #f1f5f9">${escHtml(n)}</div>`).join('')}
                     </div></div>`;
             }).join('');
-            return { node, title: 'De Sociale Mixer', subtitle: `${total} deelnemers in ${groups.length} groepen` };
+            const proj = ocProject('');
+            return { node, title: 'De Sociale Mixer', subtitle: `${proj ? proj + ' · ' : ''}${total} deelnemers in ${groups.length} groepen` };
         }
         async function doExport(kind) {
             if (!groups.length) { ocToast('Mix eerst de groepen'); return; }
@@ -1627,6 +1646,14 @@ const ocExport = (() => {
         window.addEventListener('focus', syncImport);
         window.addEventListener('storage', syncImport);
 
+        // Een geplakte lijst met één naam per regel: meteen toevoegen (een tekstveld van één regel plakt de regels anders aan elkaar)
+        nameInput.addEventListener('paste', (e) => {
+            const t = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+            if (!/[\r\n\t]/.test(t.trim())) return;
+            e.preventDefault();
+            nameInput.value = [nameInput.value, t.replace(/[\r\n\t]+/g, ',')].filter(x => x.trim()).join(',');
+            addName();
+        });
         nameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addName();
         });
