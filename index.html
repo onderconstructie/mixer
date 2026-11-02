@@ -805,6 +805,7 @@
         .name-remove { min-width:44px; justify-content:center; }
         .group-member { overflow-wrap:anywhere; }
         .summary-text .stale { display:block; margin-top:0.125rem; font-size:0.8125rem; font-weight:600; color:#b45309; }
+        .summary-text .round { display:block; margin-top:0.125rem; font-size:0.8125rem; font-weight:500; color:#64748b; }
         @media (forced-colors: active) { .mode button[aria-pressed="true"], .division-option[aria-pressed="true"] { border:2px solid Highlight; } }
         .prev-btn { margin-top:-0.5rem; }
         .oc-import + .oc-import { margin-top:-0.5rem; }
@@ -1299,8 +1300,14 @@ const ocExport = (() => {
                 const d = JSON.parse(localStorage.getItem(KEY));
                 if (d && typeof d === 'object') {
                     const num = (v, f) => Number.isFinite(+v) && +v >= 2 && +v <= 20 ? Math.round(+v) : f;
-                    return { names: Array.isArray(d.names) ? [...new Set(d.names.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, 80)))].slice(0, 300) : [],
+                    const out = { names: Array.isArray(d.names) ? [...new Set(d.names.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, 80)))].slice(0, 300) : [],
                              mode: d.mode === 'size' ? 'size' : 'count', count: num(d.count, 2), size: num(d.size, 3) };
+                    // De laatste indeling (en de rondes ervoor) blijft een halve dag staan: herladen tijdens een sessie kost je de groepjes niet
+                    const gs = v => Array.isArray(v) ? v.filter(Array.isArray).map(g => g.filter(x => typeof x === 'string').map(x => x.slice(0, 80))).filter(g => g.length) : [];
+                    const m = d.mixed;
+                    if (m && typeof m === 'object' && +m.at > Date.now() - 12 * 3600e3 && gs(m.groups).length >= 2)
+                        out.mixed = { at: +m.at, groups: gs(m.groups), rounds: Array.isArray(m.rounds) ? m.rounds.map(gs).filter(r => r.length).slice(-6) : [] };
+                    return out;
                 }
             } catch {}
             return { names: [], mode: 'count', count: 2, size: 3 };
@@ -1359,7 +1366,7 @@ const ocExport = (() => {
             }
             namesCount.textContent = names.length;
             document.getElementById('namesCountLine').lastChild.textContent = names.length === 1 ? ' deelnemer' : ' deelnemers';
-            if (!names.length) isExample = false;
+            if (!names.length) { isExample = false; rounds = []; }
             persist();
             document.getElementById('vbBar').hidden = !isExample;
             document.getElementById('actionRow').hidden = names.length === 0;
@@ -1374,17 +1381,21 @@ const ocExport = (() => {
             shuffleBtn.disabled = names.length < 2 || groupCount < 2 || groupCount > names.length;
         }
         // Aantal groepen: rechtstreeks gekozen, of afgeleid uit de gewenste grootte (de rest schuift bij in andere groepjes)
+        // Op grootte: zoveel groepjes dat ze zo dicht mogelijk bij de gekozen grootte liggen, maar nooit een groepje van één
         function groupsFor() {
             const v = parseInt(groupCountInput.value) || 2;
-            return mode === 'size' ? Math.floor(names.length / v) : v;
+            if (mode !== 'size') return v;
+            let g = Math.round(names.length / v);
+            while (g > 1 && Math.floor(names.length / g) < 2) g--;
+            return g;
         }
 
         // Check if division is possible
         function checkDivision() {
             const n = names.length;
             if (mode === 'size') {
-                const size = parseInt(groupCountInput.value) || 2, gs = Math.floor(n / size);
-                if (n < 2 || (gs >= 2 && n % size === 0)) { divisionWarning.classList.remove('show'); return; }
+                const size = parseInt(groupCountInput.value) || 2, gs = groupsFor();
+                if (n < 2 || (gs >= 2 && n === gs * size)) { divisionWarning.classList.remove('show'); return; }
                 if (gs < 2) {
                     warningTitle.textContent = 'Te weinig deelnemers';
                     warningText.textContent = `Met ${n} ${n === 1 ? 'deelnemer' : 'deelnemers'} lukt dat niet. Kies kleinere groepjes of voeg mensen toe.`;
@@ -1489,17 +1500,53 @@ const ocExport = (() => {
         }
 
         // Divide into groups
+        /* Wie al samen zat in een vorige ronde, komt liefst niet opnieuw samen.
+           We proberen een reeks willekeurige indelingen, nemen de beste en ruilen daarna nog personen tot het niet beter kan. */
+        let rounds = [];
+        const pairKey = (a, b) => a < b ? a + '\u0001' + b : b + '\u0001' + a;
+        function seenPairs() {
+            const s = new Set();
+            rounds.forEach(r => r.forEach(g => { for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) s.add(pairKey(g[i], g[j])); }));
+            return s;
+        }
+        function repeats(gs, seen) {
+            let n = 0;
+            gs.forEach(g => { for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) if (seen.has(pairKey(g[i], g[j]))) n++; });
+            return n;
+        }
+        function deal(groupCount) {
+            const gs = Array.from({ length: groupCount }, () => []);
+            shuffle(names).forEach((name, index) => gs[index % groupCount].push(name));
+            return gs;
+        }
+        function improve(gs, seen) {
+            const hits = (x, g, skip) => g.reduce((n, y) => n + (y !== x && y !== skip && seen.has(pairKey(x, y)) ? 1 : 0), 0);
+            for (let pass = 0; pass < 6; pass++) {
+                let better = false;
+                for (let a = 0; a < gs.length; a++) for (let b = a + 1; b < gs.length; b++)
+                    for (let i = 0; i < gs[a].length; i++) for (let j = 0; j < gs[b].length; j++) {
+                        const x = gs[a][i], y = gs[b][j];
+                        const now = hits(x, gs[a]) + hits(y, gs[b]), then = hits(x, gs[b], y) + hits(y, gs[a], x);
+                        if (then < now) { gs[a][i] = y; gs[b][j] = x; better = true; }
+                    }
+                if (!better) break;
+            }
+            return gs;
+        }
         function divideIntoGroups() {
             const groupCount = groupsFor();
-            const shuffled = shuffle(names);
-            
-            groups = Array.from({ length: groupCount }, () => []);
-            
-            shuffled.forEach((name, index) => {
-                groups[index % groupCount].push(name);
-            });
-            
+            // De indeling die er staat, telt als vorige ronde (ook als er intussen iemand bij kwam of wegging)
+            if (groups.length) { rounds.push(groups.map(g => g.slice())); rounds = rounds.slice(-6); }
+            const seen = seenPairs();
+            let best = deal(groupCount);
+            if (seen.size) {
+                let score = repeats(best, seen);
+                for (let t = 0; t < 60 && score > 0; t++) { const c = deal(groupCount), s = repeats(c, seen); if (s < score) { best = c; score = s; } }
+                if (score > 0 && names.length <= 120) best = improve(best, seen);
+            }
+            groups = best;
             renderGroups();
+            persist(true);
         }
 
         // Render groups
@@ -1543,8 +1590,13 @@ const ocExport = (() => {
             const inGroups = groups.flat();
             const totalMembers = inGroups.length;
             const stale = inGroups.length !== names.length || inGroups.some(n => !names.includes(n));
+            let round = '';
+            if (rounds.length && !stale) {
+                const r = repeats(groups, seenPairs());
+                round = `<span class="round">Ronde ${rounds.length + 1}: ${r ? `${r} ${r === 1 ? 'duo zat' : "duo's zaten"} al eens samen` : 'iedereen zit bij nieuwe mensen'}</span>`;
+            }
             summaryText.innerHTML = `<strong>${totalMembers}</strong> deelnemers verdeeld in <strong>${groups.length}</strong> groepen`
-                + (stale ? `<span class="stale">De lijst is veranderd. Mix opnieuw.</span>` : '');
+                + (stale ? `<span class="stale">De lijst is veranderd. Mix opnieuw.</span>` : round);
         }
 
         // Copy to clipboard
@@ -1653,13 +1705,13 @@ const ocExport = (() => {
         async function clearAll() {
             if (isExample) { clearExample(); return; }
             if (!await ocConfirm('Deelnemers wissen?', 'De namen en de groepjes verdwijnen, ook de bewaarde groep. Je kan dit nog even ongedaan maken.', 'Wissen')) return;
-            const before = { names: names.slice(), groups: groups.map(g => g.slice()), store: JSON.parse(JSON.stringify(store)) };
-            names = []; groups = []; store.names = [];
+            const before = { names: names.slice(), groups: groups.map(g => g.slice()), rounds: rounds.slice(), store: JSON.parse(JSON.stringify(store)) };
+            names = []; groups = []; rounds = []; store.names = []; delete store.mixed;
             try { localStorage.removeItem(KEY); } catch {}
             ocShare.clear('mixer');
             updateNamesList(); renderGroups();
             ocToast('Deelnemers gewist', () => {
-                names = before.names; groups = before.groups; store = before.store;
+                names = before.names; groups = before.groups; rounds = before.rounds; store = before.store;
                 updateNamesList(); renderGroups(); persist(true);
             });
         }
@@ -1668,7 +1720,7 @@ const ocExport = (() => {
         addBtn.addEventListener('click', addName);
         divisionOptions.addEventListener('click', e => { const b = e.target.closest('[data-opt]'); if (b) selectOption(b.dataset.opt === 'uneven' ? 'uneven' : +b.dataset.opt, b); });
         namesList.addEventListener('click', e => {
-            if (e.target.closest('[data-example]')) { names = EXAMPLE_NAMES.slice(); groups = []; isExample = true; groupCountInput.value = 3; updateNamesList(); renderGroups(); return; }
+            if (e.target.closest('[data-example]')) { names = EXAMPLE_NAMES.slice(); groups = []; rounds = []; isExample = true; groupCountInput.value = 3; updateNamesList(); renderGroups(); return; }
             const b = e.target.closest('[data-remove]'); if (b) removeName(+b.dataset.remove);
         });
         document.getElementById('vbWis').addEventListener('click', clearExample);
@@ -1745,6 +1797,7 @@ const ocExport = (() => {
         let persistT = null;
         function persist(now) {
             if (!isExample && names.length) store.names = names.slice();
+            if (!isExample) { if (groups.length) store.mixed = { at: store.mixed && store.mixed.groups === groups ? store.mixed.at : Date.now(), groups, rounds }; else delete store.mixed; }
             store.mode = mode;
             store[mode === 'size' ? 'size' : 'count'] = parseInt(groupCountInput.value) || (mode === 'size' ? 3 : 2);
             const write = () => {
@@ -1765,7 +1818,7 @@ const ocExport = (() => {
             prevBtn.setAttribute('aria-label', `Vorige groep overnemen: ${store.names.length} ${store.names.length === 1 ? 'naam' : 'namen'}`);
         }
         prevBtn.addEventListener('click', () => {
-            names = store.names.slice(); isExample = false; groups = [];
+            names = store.names.slice(); isExample = false; groups = []; rounds = [];
             updateNamesList(); renderGroups();
             ocToast(`${names.length} ${names.length === 1 ? 'naam' : 'namen'} van vorige keer`);
             nameInput.focus();
@@ -1826,6 +1879,7 @@ const ocExport = (() => {
 
         // Initialize
         applyMode();
+        if (store.mixed && store.names.length) { names = store.names.slice(); groups = store.mixed.groups; rounds = store.mixed.rounds; }
         updateNamesList();
         renderGroups();
         syncPrev();
