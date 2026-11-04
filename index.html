@@ -1214,7 +1214,9 @@ body { overflow-wrap:break-word; }
      ]);                                   // aanroepen na elke bewaring
      ocShare.clear('raci');                // bij "Alles wissen"
      const gekozen = await ocShare.pick({ types:['betrokkene'], self:'weerstand', title:'Doelgroepen overnemen' });
-     // geeft [] terug bij annuleren, anders de aangevinkte items (met .source en .list erbij)
+     // geeft [] terug bij annuleren, anders de aangevinkte items (met .source, .bronId en .list erbij)
+     // Afspraak: een tool geeft wat ze overnam (bronId) NIET opnieuw door, tenzij ze er een eigen oordeel aan toevoegde
+     // (een score, een eigenaar, een datum). Zo blijft de bron de baas en komt wat daar verwijderd is niet terug.
      ocShare.pick({ ..., have:['Budget goedkeuren'] })  // optioneel: wat de tool al heeft, staat uitgegrijsd ("staat er al")
      ocShare.pick({ ..., vink:false })    // niets vooraf aanvinken;  notes:false  toont geen notities (voor wie alleen namen neemt)
      window.ocHave = types => [...]       // optioneel per tool: dan telt de knop "Overnemen uit andere tools" alleen wat nieuw is
@@ -1370,7 +1372,7 @@ const ocShare = (() => {
       document.addEventListener('keydown', onKey, true);
       back.querySelector('.ocs-cancel').addEventListener('click', () => close([]));
       ok.addEventListener('click', () => close(boxes().filter(b => b.checked).map(b => {
-        const s = src[+b.dataset.s]; return { ...s.items[+b.dataset.i], source: s.tool, list: s.list };
+        const s = src[+b.dataset.s]; return { ...s.items[+b.dataset.i], source: s.tool, bronId: s.id, list: s.list };
       })));
       const first = back.querySelector('input:not(:disabled),.ocs-cancel'); first && first.focus();
     });
@@ -1526,6 +1528,8 @@ const ocExport = (() => {
                     const num = (v, f) => Number.isFinite(+v) && +v >= 2 && +v <= 20 ? Math.round(+v) : f;
                     const out = { names: Array.isArray(d.names) ? [...new Set(d.names.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, 300)))].slice(0, 300) : [],
                              mode: d.mode === 'size' ? 'size' : 'count', count: num(d.count, 2), size: num(d.size, 3) };
+                    // Herkomst: { naam (zoals de kiezer vergelijkt): id van de tool waaruit hij overgenomen werd }
+                    if (d.van && typeof d.van === 'object' && !Array.isArray(d.van)) out.van = Object.fromEntries(Object.entries(d.van).filter(([k, v]) => typeof v === 'string'));
                     // De laatste indeling (en de rondes ervoor) blijft een halve dag staan: herladen tijdens een sessie kost je de groepjes niet
                     const gs = v => Array.isArray(v) ? v.filter(Array.isArray).map(g => g.filter(x => typeof x === 'string').map(x => x.slice(0, 300))).filter(g => g.length) : [];
                     const m = d.mixed;
@@ -1705,7 +1709,7 @@ const ocExport = (() => {
             
             if (newNames.length > 0) {
                 const added = newNames.slice(0, Math.max(0, 300 - names.length));
-                added.forEach(name => names.push(name));
+                added.forEach(name => { names.push(name); if (store.van) delete store.van[ocSleutel(name)]; });   // zelf getypt: eigen werk
                 nameInput.value = '';
                 // Al gemixt? Wie te laat komt, schuift aan bij het kleinste groepje. De anderen blijven zitten.
                 if (groups.length && added.length) {
@@ -1993,10 +1997,11 @@ function ocOvergenomen(n, al, een, veel) {
             const picked = await ocShare.pick({ types:['betrokkene'], self:'mixer', title:'Namen overnemen', have:al, notes:false });
             if (!picked.length) return;
             const before = { names: names.slice(), groups: groups.map(g => g.slice()), rounds: rounds.slice(), store: JSON.parse(JSON.stringify(store)) };
-            const have = new Set(names.map(ocSleutel)), fresh = [];
+            const have = new Set(names.map(ocSleutel)), fresh = [], van = {};
             let dubbel = 0;
-            picked.forEach(p => { const n = ocNaam(p.text), k = ocSleutel(n); if (!k) return; if (have.has(k)) { dubbel++; return; } have.add(k); fresh.push(n); });
+            picked.forEach(p => { const n = ocNaam(p.text), k = ocSleutel(n); if (!k) return; if (have.has(k)) { dubbel++; return; } have.add(k); fresh.push(n); van[k] = p.bronId || p.source || 'ander'; });
             fresh.slice(0, Math.max(0, 300 - names.length)).forEach(n => { names.push(n); });
+            if (fresh.length) store.van = { ...(store.van || {}), ...van };
             if (fresh.length) updateNamesList();
             ocToast(ocOvergenomen(fresh.length, alTel + dubbel, 'naam', 'namen'), fresh.length ? () => {
                 names = before.names; groups = before.groups; rounds = before.rounds; store = before.store;
@@ -2062,13 +2067,18 @@ function ocOvergenomen(n, al, een, veel) {
         let persistT = null;
         function persist(now) {
             if (!isExample && names.length) store.names = names.slice();
+            // Herkomst alleen bijhouden voor wie er nog staat: wie je verwijdert en zelf opnieuw typt, is eigen werk
+            if (store.van) { const h = new Set(store.names.map(ocSleutel)); Object.keys(store.van).forEach(k => { if (!h.has(k)) delete store.van[k]; }); if (!Object.keys(store.van).length) delete store.van; }
             if (!isExample) { if (groups.length) store.mixed = { at: store.mixed && store.mixed.groups === groups ? store.mixed.at : Date.now(), groups, rounds }; else delete store.mixed; }
             store.mode = mode;
             store[mode === 'size' ? 'size' : 'count'] = parseInt(groupCountInput.value) || (mode === 'size' ? 3 : 2);
             const write = () => {
                 if (!store.names.length && !localStorage.getItem(KEY) && store.mode === 'count' && store.count === 2) return;
                 try { localStorage.setItem(KEY, JSON.stringify(store)); } catch {}
-                if (store.names.length) ocShare.publish('mixer', 'De Sociale Mixer', [{ name: ocProject('Deelnemers'), items: store.names.map(n => ({ type: 'betrokkene', text: n })) }]);
+                // Wie uit een andere tool overgenomen werd (store.van), geven we niet opnieuw door: de bron blijft de baas.
+                // De Mixer voegt geen oordeel toe dat een andere tool gebruikt. Alleen zelf getypte namen gaan mee.
+                const eigen = store.names.filter(n => !(store.van && store.van[ocSleutel(n)]));
+                if (eigen.length) ocShare.publish('mixer', 'De Sociale Mixer', [{ name: ocProject('Deelnemers'), items: eigen.map(n => ({ type: 'betrokkene', text: n })) }]);
                 else ocShare.clear('mixer');
                 syncPrev();
             };
