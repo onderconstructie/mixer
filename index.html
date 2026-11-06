@@ -2066,7 +2066,8 @@ function ocOvergenomen(n, al, een, veel) {
         // (Mono-Minuut, Fortuna, …). Voorbeeldnamen worden nooit bewaard of klaargelegd.
         let persistT = null;
         function persist(now) {
-            if (!isExample && names.length) store.names = names.slice();
+            // De lijst op het scherm is de bewaarde lijst: ook na herladen staat ze er meteen (voorbeeldnamen nooit)
+            if (!isExample) store.names = names.slice();
             // Herkomst alleen bijhouden voor wie er nog staat: wie je verwijdert en zelf opnieuw typt, is eigen werk
             if (store.van) { const h = new Set(store.names.map(ocSleutel)); Object.keys(store.van).forEach(k => { if (!h.has(k)) delete store.van[k]; }); if (!Object.keys(store.van).length) delete store.van; }
             if (!isExample) { if (groups.length) store.mixed = { at: store.mixed && store.mixed.groups === groups ? store.mixed.at : Date.now(), groups, rounds }; else delete store.mixed; }
@@ -2154,7 +2155,7 @@ function ocOvergenomen(n, al, een, veel) {
 
         // Initialize
         applyMode();
-        if (store.mixed && store.names.length) { names = store.names.slice(); groups = store.mixed.groups; rounds = store.mixed.rounds; }
+        if (store.names.length) { names = store.names.slice(); if (store.mixed) { groups = store.mixed.groups; rounds = store.mixed.rounds; } }
         updateNamesList();
         renderGroups();
         syncPrev();
